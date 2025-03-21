@@ -1,4 +1,3 @@
-# Unified-multi-regional-sign-language-recognition-
 # Unified Multi-Regional Sign Language Recognition using Transfer Learning
 
 ## Overview
