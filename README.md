@@ -10,7 +10,6 @@ This project focuses on developing a **multi-regional sign language recognition 
 - Train a deep learning model on BSL and NZSL.
 - Test the model's performance on ISL and Auslan.
 - Utilize **MLSLT (Multilingual Sign Language Translation)** for feature extraction.
-- Leverage **Inflated 3D Deep CNN**, **MLSLT**, and **GLoT** models for transfer learning.
 - Create a dataset of 100-200 commonly used words.
 
 ## Dataset
