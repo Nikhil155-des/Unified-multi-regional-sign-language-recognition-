@@ -1,0 +1,179 @@
+### **Basic Communication (20 words)**
+
+1. Hello
+2. Goodbye
+3. Please
+4. Thank you
+5. Sorry
+6. Yes
+7. No
+8. Help
+9. Stop
+10. More
+11. Finished
+12. Again
+13. What
+14. Who
+15. Why
+16. Where
+17. When
+18. How
+19. Name
+20. Friend
+
+### **Common Verbs (20 words)**
+
+21. Eat
+22. Drink
+23. Sleep
+24. Want
+25. Go
+26. Come
+27. See
+28. Think
+29. Like
+30. Love
+31. Talk
+32. Give
+33. Take
+34. Open
+35. Close
+36. Sit
+37. Stand
+38. Walk
+39. Run
+40. Work
+
+### **People & Relationships (20 words)**
+
+41. Mother
+42. Father
+43. Brother
+44. Sister
+45. Family
+46. Child
+47. Baby
+48. Teacher
+49. Student
+50. Doctor
+51. Friend
+52. Man
+53. Woman
+54. Boy
+55. Girl
+56. Husband
+57. Wife
+58. Grandmother
+59. Grandfather
+60. Neighbor
+
+### **Numbers (10 words)**
+
+61. One
+62. Two
+63. Three
+64. Four
+65. Five
+66. Six
+67. Seven
+68. Eight
+69. Nine
+70. Ten
+
+### **Time & Days (15 words)**
+
+71. Today
+72. Yesterday
+73. Tomorrow
+74. Morning
+75. Afternoon
+76. Evening
+77. Night
+78. Week
+79. Month
+80. Year
+81. Monday
+82. Tuesday
+83. Wednesday
+84. Thursday
+85. Friday
+
+### **Places (15 words)**
+
+86. Home
+87. School
+88. Hospital
+89. Park
+90. Office
+91. Store
+92. Bank
+93. Bus
+94. Train
+95. Airport
+96. Market
+97. Library
+98. Church
+99. Restaurant
+100. Hotel
+
+### **Common Objects (20 words)**
+
+101. Book
+102. Phone
+103. Pen
+104. Paper
+105. Chair
+106. Table
+107. Car
+108. Bicycle
+109. Bag
+110. Money
+111. Clothes
+112. Shoes
+113. Hat
+114. Key
+115. Door
+116. Window
+117. TV
+118. Computer
+119. Glasses
+120. Watch
+
+### **Emotions & States (10 words)**
+
+121. Happy
+122. Sad
+123. Angry
+124. Tired
+125. Excited
+126. Bored
+127. Scared
+128. Nervous
+129. Sick
+130. Strong
+
+### **Weather & Nature (10 words)**
+
+131. Sun
+132. Rain
+133. Snow
+134. Wind
+135. Hot
+136. Cold
+137. Cloudy
+138. Storm
+139. Fire
+140. Water
+
+### **Colors (10 words)**
+
+141. Red
+142. Blue
+143. Green
+144. Yellow
+145. Black
+146. White
+147. Brown
+148. Pink
+149. Orange
+150. Gray
