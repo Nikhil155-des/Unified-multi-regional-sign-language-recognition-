@@ -100,9 +100,8 @@ This project focuses on developing a **multi-regional sign language recognition 
 - Feel free to **contribute** by adding more sign languages or improving the model architecture.
 - Submit a pull request with detailed documentation.
 
-## License
-
 ### Project Structure:
+```
 project/
 ├── config/
 │   └── config.py                 # Configuration settings
@@ -124,6 +123,8 @@ project/
 │   └── misc.py                   # Miscellaneous helper functions
 ├── main.py                       # Entry point
 └── README.md                     # Project documentation
+```
+## License
 
 This project is open-source and available under the **MIT License**.
 
