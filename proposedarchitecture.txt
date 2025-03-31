@@ -1,0 +1,37 @@
+Feature Extraction
+What it is: This is like the system's "eyes" - it looks at videos of people signing and picks out the important parts.
+How it works:
+
+ResNet or MobileNetV3: These are computer vision models that are like trained experts at looking at images. Think of them as being really good at spotting patterns. They're smaller and faster than other models (like ViT), which means they won't need as much computer power.
+MediaPipe: This is a tool that can find and track where your hands, fingers, and body parts are in a video. Imagine it drawing dots on all your joints and tracking how they move.
+Multi-stream approach: This means we look at different things separately:
+
+One part watches the shape of your hands (like if they're open, closed, or pointing)
+Another part tracks how your hands move (the path they take)
+
+
+
+Temporal Modeling
+What it is: This helps the computer understand that signs happen over time, not just in one frozen moment.
+How it works:
+
+Temporal Convolutional Network (TCN): Instead of using a really complex system (transformer), we use a simpler one that can still understand the order of movements. It's like watching a dance and understanding the sequence of steps.
+GRUs (Gated Recurrent Units): These help the computer remember what happened earlier in the sign. Imagine trying to understand a sentence - you need to remember the beginning to make sense of the end.
+Temporal Pooling: This focuses on the most important frames in a video. Not every frame matters equally - some show the key parts of a sign, while others are just transitions.
+
+Cross-Lingual Adaptation
+What it is: This helps the system work across different sign languages (BSL, NZSL, ISL, and AuslanSL).
+How it works:
+
+MLSLT Model: This stands for Multi-Language Sign Language Transformer. It's designed to understand similarities between different sign languages. Think of it like a translator who knows multiple sign languages.
+Shared Embedding Space: Imagine we put all signs from different languages into one big map. Similar signs, even from different languages, would be close together on this map.
+Language-Specific Adapters: These are small add-ons that help the system know about specific differences between languages. Like knowing that in one language you nod for "yes" and in another you might do something different.
+
+Implementation Strategy
+What it is: This is the step-by-step plan to build and train the system.
+How it works:
+
+Pre-extracted Keypoints: Instead of analyzing full videos every time, we first mark all the important points (hands, face, etc.) and just use those. It's like using a stick figure instead of a detailed drawing.
+Combined Training: We train the system on British Sign Language and New Zealand Sign Language together, but give it hints about which language is which.
+Domain Confusion Loss: This is a clever trick to make the system focus on what's similar between languages. It's like training yourself to spot patterns that work across different languages.
+Prototypical Networks: This helps the system learn new signs with just a few examples. Imagine if you could learn a new word after seeing it only 2-3 times - that's what we want the computer to do.

@@ -100,6 +100,30 @@ This project focuses on developing a **multi-regional sign language recognition 
 - Feel free to **contribute** by adding more sign languages or improving the model architecture.
 - Submit a pull request with detailed documentation.
 
+### Project Structure:
+```
+project/
+├── config/
+│   └── config.py                 # Configuration settings
+├── data/
+│   ├── dataset.py                # Dataset classes
+│   ├── preprocessing.py          # Data preprocessing functions
+│   └── augmentation.py           # Data augmentation techniques
+├── models/
+│   ├── backbone.py               # Feature extraction backbone
+│   ├── temporal.py               # Temporal modeling components
+│   ├── adaptation.py             # Cross-lingual adaptation mechanisms
+│   └── classifier.py             # Classification head
+├── training/
+│   ├── trainer.py                # Training loop and logic
+│   ├── loss.py                   # Custom loss functions
+│   └── metrics.py                # Evaluation metrics
+├── utils/
+│   ├── visualization.py          # Visualization utilities
+│   └── misc.py                   # Miscellaneous helper functions
+├── main.py                       # Entry point
+└── README.md                     # Project documentation
+```
 ## License
 
 This project is open-source and available under the **MIT License**.
