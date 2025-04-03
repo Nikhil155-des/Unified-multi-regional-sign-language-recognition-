@@ -1,0 +1,149 @@
+🛠 Step 1: Input - The Video Feed
+Example: Video of a Person Signing "YES"
+Suppose we have a 5-second video where a Deaf individual signs "YES."
+
+This involves:
+
+Head movement (nodding)
+
+Hand movement (fist opening and closing in some variations)
+
+Facial expression (affirmative nod or slight smile in some sign languages)
+
+🔹 Frame rate: 30 FPS → 150 frames in total (5 sec × 30 FPS)
+🔹 Resolution: 1920×1080 (Full HD) → High detail, requires downsampling to reduce computation.
+
+🎥 Step 2: Preprocessing (Feature Extraction - Low Level)
+Before sending the video to the deep learning model, we extract essential features.
+
+2.1 Resize & Normalize Video
+Convert 1920×1080 → 224×224 (for MobileNetV3 or ResNet).
+
+Normalize pixel values (0-255) → (0-1) to prevent large variance.
+
+2.2 Extract Hand, Face, and Body Keypoints Using MediaPipe
+MediaPipe detects and tracks body parts:
+
+Pose landmarks (33 points)
+
+Detects head nodding (important for YES).
+
+Captures body posture.
+
+Hand landmarks (21 points per hand)
+
+Tracks fist opening/closing (if used in "YES").
+
+Face landmarks (468 points, but we select fewer)
+
+Focuses on eyebrow movement, lip shape (for expression cues).
+
+🔹 Output at this stage → A matrix of keypoints per frame:
+
+less
+Copy
+Edit
+Frame 1: [Head_X, Head_Y, Hand1_X, Hand1_Y, Hand2_X, Hand2_Y, ...]
+Frame 2: [Head_X, Head_Y, Hand1_X, Hand1_Y, Hand2_X, Hand2_Y, ...]
+...
+🎯 Step 3: Multi-Stream Feature Extraction
+Instead of treating video as a single entity, we process different motion aspects separately.
+
+3.1 Visual Feature Extraction (ResNet / MobileNetV3)
+Input: Resized 224×224 image from each frame.
+
+MobileNetV3 detects hand shape, body orientation, and face expression.
+
+ResNet extracts deeper patterns in the background/context.
+
+🔹 Output: A feature vector F_visual of size (N_frames, 512) where 512 is the feature dimension.
+
+3.2 Pose-Based Feature Extraction (MediaPipe + TCN)
+Instead of full images, we process keypoints directly.
+
+Temporal Convolutional Network (TCN)
+
+Learns the pattern of movement across frames.
+
+Example: Detects head nodding as a repetitive motion for YES.
+
+Compresses raw keypoint data into meaningful motion features.
+
+🔹 Output: A motion feature vector F_motion of size (N_frames, 256).
+
+⏳ Step 4: Temporal Modeling - Understanding Sign Sequences
+At this stage, the model must understand how the motion evolves over time.
+
+4.1 Gated Recurrent Units (GRUs)
+GRUs remember past movements and recognize continuous motion.
+
+Example: It stores information about the nodding motion from previous frames to ensure it completes the action before classifying it as "YES."
+
+🔹 Output: A temporal representation F_temporal of size (256).
+
+4.2 Temporal Pooling
+Not all 150 frames matter—some just capture in-between movements.
+
+We apply temporal pooling to focus on key moments:
+
+Select 5-10 most important frames.
+
+Ensures faster and more robust recognition.
+
+🌍 Step 5: Cross-Lingual Adaptation
+Now, the system must map the extracted features to a shared sign language representation.
+
+5.1 MLSLT (Multi-Language Sign Language Transformer)
+Converts F_temporal into a shared representation space.
+
+Ensures similar signs (YES in BSL, NZSL, ISL, AuslanSL) are close together.
+
+🔹 Output: Language-independent feature F_shared (512-dimensional).
+
+5.2 Language-Specific Adapters
+Adds small adjustments for each language:
+
+BSL might have an eyebrow raise.
+
+NZSL may have a subtle difference in motion range.
+
+ISL might be more expressive facially.
+
+Ensures fine-grained adaptation.
+
+📌 Step 6: Classification & Adaptation
+Now, we classify the sign and ensure it generalizes to new languages.
+
+6.1 Domain Confusion Loss
+Forces the model to focus on common features across languages.
+
+Example: It learns that "YES" has a nod + slight hand movement in all languages.
+
+6.2 Prototypical Networks for Few-Shot Learning
+If a new variant of YES appears in ISL or AuslanSL, the model quickly adapts with only a few examples.
+
+🔹 Final Output: A probability distribution over 100 words:
+
+arduino
+Copy
+Edit
+{ "YES": 97.8%, "NO": 0.5%, "HELLO": 1.0%, ... }
+✅ Model classifies YES correctly with high confidence.
+
+⚡ Full Low-Level Flow Summary
+1️⃣ Input: A 5-sec video of "YES" → 150 frames
+2️⃣ Preprocessing: Resize, normalize, extract keypoints (33 pose, 21×2 hands, 50 face)
+3️⃣ Feature Extraction:
+🔹 ResNet/MobileNetV3 → Extracts visual hand shape features
+🔹 MediaPipe → Extracts pose-based motion
+4️⃣ Temporal Processing:
+🔹 TCN → Captures movement patterns (head nod, hand movement)
+🔹 GRU → Stores motion memory to recognize sequences
+🔹 Temporal Pooling → Focuses on key frames
+5️⃣ Cross-Lingual Adaptation:
+🔹 MLSLT Transformer → Maps all languages into shared space
+🔹 Language-Specific Adapters → Fine-tunes per language
+6️⃣ Classification:
+🔹 Domain Confusion Loss → Focuses on universal features
+🔹 Prototypical Networks → Handles unseen ISL/AuslanSL signs
+7️⃣ Final Output → "YES" (97.8% confidence)
