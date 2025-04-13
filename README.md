@@ -102,27 +102,33 @@ This project focuses on developing a **multi-regional sign language recognition 
 
 ### Project Structure:
 ```
-project/
-├── config/
-│   └── config.py                 # Configuration settings
-├── data/
-│   ├── dataset.py                # Dataset classes
-│   ├── preprocessing.py          # Data preprocessing functions
-│   └── augmentation.py           # Data augmentation techniques
-├── models/
-│   ├── backbone.py               # Feature extraction backbone
-│   ├── temporal.py               # Temporal modeling components
-│   ├── adaptation.py             # Cross-lingual adaptation mechanisms
-│   └── classifier.py             # Classification head
-├── training/
-│   ├── trainer.py                # Training loop and logic
-│   ├── loss.py                   # Custom loss functions
-│   └── metrics.py                # Evaluation metrics
+unified_sign_recognition/
+│
+├── dataset/
+│   ├── train/
+│   │   └── BSL_NZSL/
+│   └── test/
+│       └── ISL_Auslan/
+│
+├── data_loader/
+│   ├── video_preprocessing.py      # Resize, normalize, extract keypoints
+│   ├── pose_estimator.py           # Extract 468 keypoints using MediaPipe/OpenPose
+│   └── dataset.py                  # Custom PyTorch dataset loader
+│
+├── model/
+│   ├── temporal_cnn.py             # GRU + Temporal CNN + Max Pool
+│   ├── mlslt.py                    # MLSLT Model: Encoder-Decoder architecture
+│   └── transfer_head.py            # For transfer learning layer fine-tuning
+│
 ├── utils/
-│   ├── visualization.py          # Visualization utilities
-│   └── misc.py                   # Miscellaneous helper functions
-├── main.py                       # Entry point
-└── README.md                     # Project documentation
+│   ├── train_utils.py              # Training loop, early stopping, LR scheduler
+│   ├── eval_metrics.py             # Accuracy, BLEU, WER, etc.
+│   └── config.py                   # Configs and hyperparameters
+│
+├── main.py                         # Complete training + testing pipeline
+├── inference.py                    # Inference script for video input
+└── README.md
+
 ```
 ## License
 
