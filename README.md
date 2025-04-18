@@ -21,12 +21,12 @@ This project focuses on developing a **multi-regional sign language recognition 
   dataset/
   ├── train/
   │   ├── BSL_NZSL/
-  │   │   ├── word1.mp4
-  │   │   ├── word2.mp4
+  │   │   ├── word1/video1.mp4, video2.mp4, video3.mp4..
+  │   │   ├── word2/video1.mp4, video2.mp4, video3.mp4..
   ├── test/
   │   ├── ISL_Auslan/
-  │   │   ├── word1.mp4
-  │   │   ├── word2.mp4
+  │   │   ├── word1/video1.mp4, video2.mp4, video3.mp4..
+  │   │   ├── word2/video1.mp4, video2.mp4, video3.mp4..
   ```
 
 ## Methodology
@@ -106,9 +106,9 @@ unified_sign_recognition/
 │
 ├── dataset/
 │   ├── train/
-│   │   └── BSL_NZSL/
+│   │   └── BSL_NZSL/word1/video1.mp4, video2.mp4....videon.mp4
 │   └── test/
-│       └── ISL_Auslan/
+│       └── ISL_Auslan/word1/video1.mp4, video2.mp4....videon.mp4
 │
 ├── data_loader/
 │   ├── video_preprocessing.py      # Resize, normalize, extract keypoints
