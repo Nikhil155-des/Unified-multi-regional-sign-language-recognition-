@@ -1,9 +1,8 @@
-"""
-Configuration settings for the Unified Multi-Regional Sign Language Recognition model.
-"""
+"""Configuration settings for the Unified Multi-Regional Sign Language Recognition model."""
 
 import os
 from pathlib import Path
+import torch
 
 # Project root directory
 ROOT_DIR = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -31,13 +30,18 @@ POSE_LANDMARKS = 33  # Number of pose landmarks
 HAND_LANDMARKS = 21  # Number of landmarks per hand
 FACE_LANDMARKS = 468  # Total face landmarks
 SELECTED_FACE_LANDMARKS = 50  # Number of selected face landmarks to use
+TOTAL_KEYPOINT_DIM = POSE_LANDMARKS * 3 + HAND_LANDMARKS * 3 * 2 + SELECTED_FACE_LANDMARKS * 3
 
 # Model parameters
-VISUAL_FEATURE_DIM = 512
-MOTION_FEATURE_DIM = 256
-TEMPORAL_FEATURE_DIM = 256
-SHARED_FEATURE_DIM = 512
+VISUAL_FEATURE_DIM = 512  # Feature dimension from ResNet/MobileNetV3 [cite: 12]
+MOTION_FEATURE_DIM = 256  # Feature dimension from TCN [cite: 15]
+TEMPORAL_FEATURE_DIM = 256 # GRU hidden dimension
+MLSLT_FEATURE_DIM = 512 # MLSLT output dimension [cite: 23]
+MLSLT_HIDDEN_DIM = 512
+MLSLT_NUM_LAYERS = 2
+MLSLT_DROPOUT = 0.1
 NUM_CLASSES = 100  # Assuming 100 sign words in the dataset
+TCN_OUTPUT_SEQUENCE_LENGTH = 10 # Output frames from TCN
 
 # Training parameters
 BATCH_SIZE = 16
