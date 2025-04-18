@@ -8,11 +8,11 @@ import torch
 ROOT_DIR = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Data directories
-DATASET_DIR = ROOT_DIR / 'dataset'
-TRAIN_DIR = DATASET_DIR / 'train' / 'BSL_NZSL'
-TEST_DIR = DATASET_DIR / 'test' / 'ISL_Auslan'
-MODEL_SAVE_DIR = ROOT_DIR / 'saved_models'
-LOG_DIR = ROOT_DIR / 'logs'
+DATASET_DIR = "D:/Engeneering/Third Year/SEM6/Unified-multi-regional-sign-language-recognition-/dataset"
+TRAIN_DIR = "D:/Engeneering/Third Year/SEM6/Unified-multi-regional-sign-language-recognition-/dataset/train/BSL_NZSL"
+TEST_DIR = "D:/Engeneering/Third Year/SEM6/Unified-multi-regional-sign-language-recognition-/dataset/test/ISL_Auslan"
+MODEL_SAVE_DIR = "D:/Engeneering/Third Year/SEM6/Unified-multi-regional-sign-language-recognition-/saved_models"
+LOG_DIR = "D:/Engeneering/Third Year/SEM6/Unified-multi-regional-sign-language-recognition-/logs"
 
 # Create directories if they don't exist
 for dir_path in [DATASET_DIR, TRAIN_DIR, TEST_DIR, MODEL_SAVE_DIR, LOG_DIR]:
@@ -40,14 +40,14 @@ MLSLT_FEATURE_DIM = 512 # MLSLT output dimension [cite: 23]
 MLSLT_HIDDEN_DIM = 512
 MLSLT_NUM_LAYERS = 2
 MLSLT_DROPOUT = 0.1
-NUM_CLASSES = 100  # Assuming 100 sign words in the dataset
+NUM_CLASSES = 56 # Assuming 100 sign words in the dataset
 TCN_OUTPUT_SEQUENCE_LENGTH = 10 # Output frames from TCN
 
 # Training parameters
 BATCH_SIZE = 16
 LEARNING_RATE = 1e-4
 WEIGHT_DECAY = 1e-5
-NUM_EPOCHS = 50
+NUM_EPOCHS = 1
 EARLY_STOPPING_PATIENCE = 10
 CHECKPOINT_INTERVAL = 5  # Save every N epochs
 
