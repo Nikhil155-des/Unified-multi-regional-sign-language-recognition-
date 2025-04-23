@@ -3,6 +3,13 @@ import numpy as np
 import mediapipe as mp
 from utils.config import POSE_LANDMARKS, HAND_LANDMARKS, FACE_LANDMARKS, SELECTED_FACE_LANDMARKS
 
+import os
+import sys
+
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, ROOT_DIR)  # Add root to sys.path
+
+from utils.config import VIDEO_RESIZE_DIM, NORMALIZATION_MEAN, NORMALIZATION_STD, MAX_FRAMES, FPS
 class PoseEstimator:
     def __init__(self):
         self.mp_holistic = mp.solutions.holistic

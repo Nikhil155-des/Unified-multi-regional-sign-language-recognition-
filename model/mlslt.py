@@ -78,7 +78,7 @@ if __name__ == '__main__':
     decoder_input_dim = 256 # Can be embedding dim
     hidden_dim = 512
     num_layers = 2
-    output_dim = 100 # Vocabulary size
+    output_dim = 56 # Vocabulary size
     dropout = 0.1
     batch_size = 16
     seq_len = 10

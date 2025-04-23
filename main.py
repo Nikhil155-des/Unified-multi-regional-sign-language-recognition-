@@ -1,94 +1,138 @@
+import argparse
 import torch
 import torch.nn as nn
-from torch.optim import Adam
-from torch.utils.data import DataLoader
-from dataloader.dataset import SignLanguageDataset
+import numpy as np
+from utils.config import *
+from train import train
 from model.temporal_cnn import TemporalCNN
-from model.mlslt import MLSLT
 from model.visual_extractor import VisualFeatureExtractor
-from utils.config import * # Import all configs
+from model.mlslt import MLSLT
+from dataloader.dataset import SignLanguageDataset
+from torch.utils.data import DataLoader
+from utils.eval_metrics import evaluate_model
 
 class SignClassifier(nn.Module):
-    def __init__(self, input_dim, num_classes):
+    """Final classification head for sign language recognition."""
+    def __init__(self, input_dim, hidden_dim, num_classes):
         super(SignClassifier, self).__init__()
-        self.fc = nn.Linear(input_dim, num_classes)  # The Transfer Head
-
+        self.fc1 = nn.Linear(input_dim, hidden_dim)
+        self.fc2 = nn.Linear(hidden_dim, num_classes)
+        self.dropout = nn.Dropout(0.3)
+        self.relu = nn.ReLU()
+        
     def forward(self, x):
-        return self.fc(x)
+        x = self.dropout(self.relu(self.fc1(x)))
+        x = self.fc2(x)
+        return x
 
-def train_one_epoch(model_tcn, model_mlslt, model_visual, classifier, data_loader, optimizer, device):
-    model_tcn.train()
-    model_mlslt.train()
-    model_visual.train()
-    classifier.train() # Set classifier to train mode
-    total_loss = 0
-    for batch_idx, (keypoint_sequences, labels) in enumerate(data_loader):
-        keypoint_sequences = keypoint_sequences.to(device)
-        labels = labels.to(device)
+def parse_args():
+    parser = argparse.ArgumentParser(description="Unified Multi-Regional Sign Language Recognition")
+    parser.add_argument('--mode', type=str, default='train', choices=['train', 'test', 'inference'],
+                       help="Mode to run: train, test, or inference")
+    parser.add_argument('--checkpoint', type=str, default='saved_models/final_model.pth',
+                       help="Path to checkpoint for testing or inference")
+    parser.add_argument('--video_path', type=str, default=None,
+                       help="Path to video file for inference mode")
+    return parser.parse_args()
 
-        optimizer.zero_grad()
+def test_model(checkpoint_path):
+    device = torch.device(DEVICE)
+    
+    model_tcn = TemporalCNN(TOTAL_KEYPOINT_DIM, hidden_size=512, num_layers=2).to(device)
+    model_visual = VisualFeatureExtractor().to(device)
+    model_mlslt = MLSLT(
+        encoder_input_dim=MOTION_FEATURE_DIM + VISUAL_FEATURE_DIM,
+        decoder_input_dim=512,
+        hidden_dim=MLSLT_HIDDEN_DIM,
+        num_layers=MLSLT_NUM_LAYERS,
+        output_dim=100,
+        dropout=MLSLT_DROPOUT
+    ).to(device)
+    classifier = SignClassifier(MLSLT_HIDDEN_DIM, 256, NUM_CLASSES).to(device)
+    
+    checkpoint = torch.load(checkpoint_path)
+    model_tcn.load_state_dict(checkpoint['model_tcn'])
+    model_visual.load_state_dict(checkpoint['model_visual'])
+    model_mlslt.load_state_dict(checkpoint['model_mlslt'])
+    classifier.load_state_dict(checkpoint['classifier'])
+    
+    test_dataset = SignLanguageDataset(TEST_DIR, sequence_length=MAX_FRAMES)
+    test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
+    
+    metrics = evaluate_model(model_tcn, model_visual, model_mlslt, classifier, test_loader, device)
+    print("\nTest Metrics:")
+    print(f"Accuracy: {metrics['accuracy']:.4f}")
+    print(f"Precision: {metrics['precision']:.4f}")
+    print(f"Recall: {metrics['recall']:.4f}")
+    print(f"F1 Score: {metrics['f1']:.4f}")
 
-        # 1. Pose-Based Feature Extraction
-        tcn_output = model_tcn(keypoint_sequences)  # (batch_size, 10, 256)
+def inference(checkpoint_path, video_path):
+    device = torch.device(DEVICE)
+    
+    model_tcn = TemporalCNN(TOTAL_KEYPOINT_DIM, hidden_size=512, num_layers=2).to(device)
+    model_visual = VisualFeatureExtractor().to(device)
+    model_mlslt = MLSLT(
+        encoder_input_dim=MOTION_FEATURE_DIM + VISUAL_FEATURE_DIM,
+        decoder_input_dim=512,
+        hidden_dim=MLSLT_HIDDEN_DIM,
+        num_layers=MLSLT_NUM_LAYERS,
+        output_dim=100,
+        dropout=MLSLT_DROPOUT
+    ).to(device)
+    classifier = SignClassifier(MLSLT_HIDDEN_DIM, 256, NUM_CLASSES).to(device)
+    
+    checkpoint = torch.load(checkpoint_path)
+    model_tcn.load_state_dict(checkpoint['model_tcn'])
+    model_visual.load_state_dict(checkpoint['model_visual'])
+    model_mlslt.load_state_dict(checkpoint['model_mlslt'])
+    classifier.load_state_dict(checkpoint['classifier'])
+    
+    from dataloader.video_preprocessing import process_video, sample_frames
+    from dataloader.pose_estimation import PoseEstimator
+    
+    frames = process_video(video_path)
+    frames = sample_frames(frames, max_frames=MAX_FRAMES)
+    
+    pose_estimator = PoseEstimator()
+    keypoint_sequences = []
+    for frame in frames:
+        keypoints = pose_estimator.extract_keypoints(frame)
+        keypoint_sequences.append(keypoints if keypoints is not None else np.zeros(TOTAL_KEYPOINT_DIM))
+     
+    if len(keypoint_sequences) < MAX_FRAMES:
+        keypoint_sequences.extend([np.zeros(TOTAL_KEYPOINT_DIM)] * (MAX_FRAMES - len(keypoint_sequences)))
+    elif len(keypoint_sequences) > MAX_FRAMES:
+        keypoint_sequences = keypoint_sequences[:MAX_FRAMES]
+    
+    keypoint_sequences = torch.tensor(np.array(keypoint_sequences), dtype=torch.float32).unsqueeze(0).to(device)
+    
+    with torch.no_grad():
+        model_tcn.eval()
+        model_visual.eval()
+        model_mlslt.eval()
+        classifier.eval()
+        
+        tcn_output = model_tcn(keypoint_sequences)
+        dummy_frames = torch.randn(1 * MAX_FRAMES, 3, 224, 224).to(device)
+        visual_features = model_visual(dummy_frames)
+        visual_features = visual_features.view(1, MAX_FRAMES, VISUAL_FEATURE_DIM)
+        combined_features = torch.cat((tcn_output, visual_features), dim=-1)
+        shared_features = model_mlslt.encode(combined_features)
+        outputs = classifier(shared_features)
+        _, predicted = torch.max(outputs.data, 1)
+    
+    test_dataset = SignLanguageDataset(TEST_DIR)
+    predicted_label = test_dataset.classes[predicted.item()]
+    print(f"\nPredicted Sign: {predicted_label}")
 
-        # 2. Visual Feature Extraction
-        # Assuming your dataset returns frames along with keypoints, or you load them here
-        # For simplicity, let's create dummy visual features (replace with actual frame loading)
-        batch_size = keypoint_sequences.size(0)
-        num_frames = keypoint_sequences.size(1)
-        dummy_frames = torch.randn(batch_size * num_frames, 3, 224, 224).to(device)  # (batch_size * 10, 3, 224, 224)
-        visual_features = model_visual(dummy_frames)  # (batch_size * 10, 512)
-        visual_features = visual_features.view(batch_size, num_frames, VISUAL_FEATURE_DIM)  # (batch_size, 10, 512)
-
-        # 3. Concatenate (or Fuse) Pose and Visual Features
-        # Example: Simple concatenation
-        combined_features = torch.cat((tcn_output, visual_features), dim=-1)  # (batch_size, 10, 256 + 512)
-
-        # 4. MLSLT Encoder
-        # Use only the encoder to get the shared representation
-        shared_features = model_mlslt.encode(combined_features)  # (batch_size, MLSLT_HIDDEN_DIM)
-
-        # 5. Classification (using the Transfer Head)
-        output = classifier(shared_features)
-        loss_fn = nn.CrossEntropyLoss()
-        loss = loss_fn(output, labels)
-
-        loss.backward()
-        optimizer.step()
-
-        total_loss += loss.item()
-
-    return total_loss / len(data_loader)
-
-def main():
-    # Load Data
-    train_dataset = SignLanguageDataset(root_dir=TRAIN_DIR, sequence_length=30)
-    train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
-
-    # Initialize Models
-    model_tcn = TemporalCNN(input_size=TOTAL_KEYPOINT_DIM, hidden_size=256, num_layers=2).to(DEVICE)
-    model_mlslt = MLSLT(encoder_input_dim=256 + VISUAL_FEATURE_DIM,  # Input dim to MLSLT encoder
-                         decoder_input_dim=256,  # Example
-                         hidden_dim=MLSLT_HIDDEN_DIM,
-                         num_layers=MLSLT_NUM_LAYERS,
-                         output_dim=100,  # Example
-                         dropout=MLSLT_DROPOUT).to(DEVICE)
-    model_visual = VisualFeatureExtractor().to(DEVICE)
-
-    # Initialize Transfer Head (SignClassifier)
-    classifier = SignClassifier(input_dim=MLSLT_HIDDEN_DIM, num_classes=NUM_CLASSES).to(DEVICE)
-
-    # Optimizer
-    optimizer = Adam(list(model_tcn.parameters()) +
-                     list(model_mlslt.parameters()) +
-                     list(model_visual.parameters()) +
-                     list(classifier.parameters()), # Include classifier parameters
-                     lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
-
-    # Training Loop
-    for epoch in range(NUM_EPOCHS):
-        avg_loss = train_one_epoch(model_tcn, model_mlslt, model_visual, classifier, train_dataloader, optimizer, DEVICE)
-        print(f'Epoch: {epoch + 1}, Loss: {avg_loss}')
-
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+    args = parse_args()
+    
+    if args.mode == 'train':
+        train()
+    elif args.mode == 'test':
+        test_model(args.checkpoint)
+    elif args.mode == 'inference':
+        if not args.video_path:
+            raise ValueError("Video path is required for inference")
+        inference(args.checkpoint, args.video_path)

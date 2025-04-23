@@ -5,7 +5,7 @@ from pathlib import Path
 import torch
 
 # Project root directory
-ROOT_DIR = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # Project root
 
 # Data directories
 DATASET_DIR = "D:/Engeneering/Third Year/SEM6/Unified-multi-regional-sign-language-recognition-/dataset"
@@ -30,8 +30,8 @@ POSE_LANDMARKS = 33  # Number of pose landmarks
 HAND_LANDMARKS = 21  # Number of landmarks per hand
 FACE_LANDMARKS = 468  # Total face landmarks
 SELECTED_FACE_LANDMARKS = 50  # Number of selected face landmarks to use
-TOTAL_KEYPOINT_DIM = POSE_LANDMARKS * 3 + HAND_LANDMARKS * 3 * 2 + SELECTED_FACE_LANDMARKS * 3
-
+# Correct this based on actual pose estimator output
+TOTAL_KEYPOINT_DIM = 33*3 + 21*3*2 + 50*3  # Should be 357
 # Model parameters
 VISUAL_FEATURE_DIM = 512  # Feature dimension from ResNet/MobileNetV3 [cite: 12]
 MOTION_FEATURE_DIM = 256  # Feature dimension from TCN [cite: 15]

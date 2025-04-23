@@ -113,11 +113,9 @@ if __name__ == '__main__':
         model_visual.load_state_dict(checkpoint['model_state_dict']['model_visual'])
         classifier.load_state_dict(checkpoint['model_state_dict']['classifier'])
         print(f"Loaded model from {checkpoint_path}")
-    elif:
-        print(f"Checkpoint not found at {checkpoint_path}.initialized weights.")
     else:
         print("Using randomly initialized weights.")
     # Example Inference
-    sample_video_path = "dataset/test/ISL_Auslan/word1/video1.mp4"  # Replace with a valid test video path
+    sample_video_path = "D:\\Engeneering\\Third Year\\SEM6\\Unified-multi-regional-sign-language-recognition-\\dataset\\test\\ISL_Auslan\\again\\video1.mp4"  # Replace with a valid test video path
     predicted_sign = inference(sample_video_path, model_tcn, model_visual, model_mlslt, classifier, DEVICE)
     print(f"Predicted sign for {sample_video_path}: {predicted_sign}")
