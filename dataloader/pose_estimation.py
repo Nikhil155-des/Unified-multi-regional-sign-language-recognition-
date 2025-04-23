@@ -33,6 +33,7 @@ class PoseEstimator:
                         left hand (21*3), and right hand (21*3), and face (468*3)
                         keypoints, or None if no pose is detected. We are selecting only 50 face landmarks
         """
+        frame = frame.astype(np.uint8)
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         results = self.holistic.process(rgb_frame)
         keypoints = []
